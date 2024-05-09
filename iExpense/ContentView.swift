@@ -13,6 +13,7 @@ struct ExpenseItem: Identifiable, Codable{
     var name: String
     var type: String
     var amount: Double
+    var currency = "USD"
 }
 
 @Observable
@@ -51,7 +52,7 @@ struct ContentView: View {
                             Text(item.type)
                         }
                         Spacer()
-                        Text(item.amount, format: .currency(code: "USD"))
+                        Text(item.amount, format: .currency(code: item.currency))
                     }
                 }
                 .onDelete(perform: removeExtense)
