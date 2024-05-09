@@ -44,7 +44,15 @@ struct ContentView: View {
         NavigationStack{
             List{
                 ForEach(expense.items){ item in
-                    Text(item.name)
+                    HStack{
+                        VStack(alignment: .leading){
+                            Text(item.name)
+                                .font(.headline)
+                            Text(item.type)
+                        }
+                        Spacer()
+                        Text(item.amount, format: .currency(code: "USD"))
+                    }
                 }
                 .onDelete(perform: removeExtense)
             }
@@ -58,6 +66,7 @@ struct ContentView: View {
         .sheet(isPresented: $showingAddView){
             AddView(expense: expense)
         }
+        
     }
 }
 

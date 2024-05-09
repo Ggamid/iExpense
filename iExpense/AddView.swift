@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct AddView: View {
+    @Environment(\.dismiss) var dismiss
+    
     @State private var name: String = ""
     @State private var amount: Double = 0.0
     @State private var type: String = "Personal"
@@ -33,8 +35,11 @@ struct AddView: View {
             }
             .navigationTitle("Add new expense")
             .toolbar {
-                Button("Done") {
-                    expense.items.append(ExpenseItem(id: UUID(), name: name, type: type, amount: amount))
+                Button(name != "" && amount >= 0.0 ? "Save" : "Cancel") {
+                    if name != "" && amount != 0.0{
+                        expense.items.append(ExpenseItem(id: UUID(), name: name, type: type, amount: amount))
+                    }
+                    dismiss()
                 }
             }
         }
