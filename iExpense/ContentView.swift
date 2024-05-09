@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ExpenseItem: Identifiable{
+struct ExpenseItem: Identifiable, Codable{
     
     var id: UUID
     var name: String
@@ -17,7 +17,23 @@ struct ExpenseItem: Identifiable{
 
 @Observable
 class Expense{
-    var items = [ExpenseItem]()
+    var items = [ExpenseItem]() {
+        didSet{
+            if let encoded = try? JSONEncoder().encode(items){
+                UserDefaults.standard.set(encoded, forKey: "items")
+            }
+        }
+    }
+    
+    init(){
+        if let savedItems = UserDefaults.standard.data(forKey: "items"){
+            if let decodeItems = try? JSONDecoder().decode([ExpenseItem].self, from: savedItems){
+                items = decodeItems
+                return
+            }
+        }
+        items = []
+    }
 }
 
 struct ContentView: View {
