@@ -25,40 +25,90 @@ class Expense{
             }
         }
     }
+    var personalItems = [ExpenseItem]()
+    var businessItems = [ExpenseItem]()
     
     init(){
         if let savedItems = UserDefaults.standard.data(forKey: "items"){
             if let decodeItems = try? JSONDecoder().decode([ExpenseItem].self, from: savedItems){
                 items = decodeItems
+                personalItems = getExpensesSeparated(from: items, by: "Personal")
+                businessItems = getExpensesSeparated(from: items, by: "Business")
                 return
             }
         }
         items = []
     }
+    
+    func getExpensesSeparated(from arr: [ExpenseItem], by type: String) -> [ExpenseItem]{
+        var resArr = [ExpenseItem]()
+        for i in arr{
+            if i.type == type{
+                resArr.append(i)
+            }
+        }
+        return resArr
+    }
+    
 }
 
 struct ContentView: View {
     var expense = Expense()
     @State var showingAddView = false
-    
+
     var body: some View {
         NavigationStack{
             List{
-                ForEach(expense.items){ item in
-                    HStack{
-                        VStack(alignment: .leading){
-                            Text(item.name)
-                                .font(.headline)
-                            Text(item.type)
+                if !expense.businessItems.isEmpty {
+                    Section("Business expenses"){
+                        ForEach(expense.businessItems){ item in
+                            HStack{
+                                VStack(alignment: .leading){
+                                    Text(item.name)
+                                        .font(.headline)
+                                    Text(item.type)
+                                }
+                                Spacer()
+                                Text(item.amount, format: .currency(code: item.currency))
+                            }
+                            .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
+                            .padding()
+                            .background(getColor(by: item.amount))
                         }
-                        Spacer()
-                        Text(item.amount, format: .currency(code: item.currency))
+                        .onDelete(perform: { indexSet in
+                            removeExtense(offset: indexSet, type: "Business")
+                        })
                     }
-                    .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
-                    .padding()
-                    .background(getColor(by: item.amount))
+                } else {
+                    Section("Business expenses"){
+                        Text("There is no any Business expenses")
+                    }
                 }
-                .onDelete(perform: removeExtense)
+                if !expense.personalItems.isEmpty {
+                    Section("Personal expenses"){
+                        ForEach(expense.personalItems){ item in
+                            HStack{
+                                VStack(alignment: .leading){
+                                    Text(item.name)
+                                        .font(.headline)
+                                    Text(item.type)
+                                }
+                                Spacer()
+                                Text(item.amount, format: .currency(code: item.currency))
+                            }
+                            .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
+                            .padding()
+                            .background(getColor(by: item.amount))
+                        }
+                        .onDelete(perform: { indexSet in
+                            removeExtense(offset: indexSet, type: "Personal")
+                        })
+                    }
+                } else {
+                    Section("Personal expenses"){
+                        Text("There is no any Personal expenses")
+                    }
+                }
                 
                 
             }
@@ -81,9 +131,14 @@ struct ContentView: View {
 }
 
 extension ContentView{
-    func removeExtense(offset: IndexSet){
-        expense.items.remove(atOffsets: offset)
+    func removeExtense(offset: IndexSet, type: String){
+        if type == "Business"{
+            expense.businessItems.remove(atOffsets: offset)
+        } else {
+            expense.personalItems.remove(atOffsets: offset)
+        }
     }
+    
     
     func getColor(by amount: Double) -> Color {
         switch amount{
