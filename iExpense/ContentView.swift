@@ -54,8 +54,13 @@ struct ContentView: View {
                         Spacer()
                         Text(item.amount, format: .currency(code: item.currency))
                     }
+                    .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
+                    .padding()
+                    .background(getColor(by: item.amount))
                 }
                 .onDelete(perform: removeExtense)
+                
+                
             }
             .navigationTitle("iExpense")
             .toolbar{
@@ -78,5 +83,14 @@ struct ContentView: View {
 extension ContentView{
     func removeExtense(offset: IndexSet){
         expense.items.remove(atOffsets: offset)
+    }
+    
+    func getColor(by amount: Double) -> Color {
+        switch amount{
+        case 0...10: return Color.green.opacity(0.7)
+        case 10...100: return Color.orange.opacity(0.7)
+        default: return Color.red.opacity(0.7)
+        }
+        
     }
 }
