@@ -18,37 +18,43 @@ struct ExpenseItem: Identifiable, Codable{
 
 @Observable
 class Expense{
-    var items = [ExpenseItem]() {
+    var personalItems = [ExpenseItem]() {
         didSet{
-            if let encoded = try? JSONEncoder().encode(items){
-                UserDefaults.standard.set(encoded, forKey: "items")
+            if let encoded = try? JSONEncoder().encode(personalItems){
+                UserDefaults.standard.set(encoded, forKey: "itemsPersonal")
             }
         }
     }
-    var personalItems = [ExpenseItem]()
-    var businessItems = [ExpenseItem]()
+    var businessItems = [ExpenseItem]() {
+        didSet{
+            if let encoded = try? JSONEncoder().encode(businessItems){
+                UserDefaults.standard.set(encoded, forKey: "itemsBusiness")
+            }
+        }
+    }
+
     
     init(){
-        if let savedItems = UserDefaults.standard.data(forKey: "items"){
+        if let savedItems = UserDefaults.standard.data(forKey: "itemsPersonal"){
             if let decodeItems = try? JSONDecoder().decode([ExpenseItem].self, from: savedItems){
-                items = decodeItems
-                personalItems = getExpensesSeparated(from: items, by: "Personal")
-                businessItems = getExpensesSeparated(from: items, by: "Business")
+                personalItems = decodeItems
+            }
+        }
+        
+        if personalItems.isEmpty {
+            personalItems = []
+        }
+        
+        if let savedItems = UserDefaults.standard.data(forKey: "itemsBusiness"){
+            if let decodeItems = try? JSONDecoder().decode([ExpenseItem].self, from: savedItems){
+                businessItems = decodeItems
                 return
             }
         }
-        items = []
+        
+        businessItems = []
     }
     
-    func getExpensesSeparated(from arr: [ExpenseItem], by type: String) -> [ExpenseItem]{
-        var resArr = [ExpenseItem]()
-        for i in arr{
-            if i.type == type{
-                resArr.append(i)
-            }
-        }
-        return resArr
-    }
     
 }
 

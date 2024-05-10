@@ -45,7 +45,11 @@ struct AddView: View {
             .toolbar {
                 Button(name != "" && amount >= 0.0 ? "Save" : "Cancel") {
                     if name != "" && amount != 0.0{
-                        expense.items.append(ExpenseItem(id: UUID(), name: name, type: type, amount: amount, currency: currency))
+                        if type == "Personal"{
+                            expense.personalItems.append(ExpenseItem(id: UUID(), name: name, type: type, amount: amount, currency: currency))
+                        } else {
+                            expense.businessItems.append(ExpenseItem(id: UUID(), name: name, type: type, amount: amount, currency: currency))
+                        }
                     }
                     dismiss()
                 }
