@@ -10,10 +10,11 @@ import SwiftUI
 struct AddView: View {
     @Environment(\.dismiss) var dismiss
     
-    @State private var name: String = ""
+    @State private var name: String = "Name of Expense"
     @State private var amount: Double = 0.0
     @State private var type: String = "Personal"
     @State private var currency: String = "USD"
+    
     
     let types = ["Personal", "Business"]
     let currencies = ["USD", "RUB", "EUR", "KZT", "SSP"]
@@ -24,24 +25,27 @@ struct AddView: View {
         NavigationStack{
             
             Form{
-                TextField("Name", text: $name)
-                
-                Picker("Type", selection: $type) {
-                    ForEach(types, id: \.self){
-                        Text($0)
+                Section("Add new expense"){
+//                    TextField("Name", text: $name)
+                    
+                    Picker("Type", selection: $type) {
+                        ForEach(types, id: \.self){
+                            Text($0)
+                        }
                     }
-                }
-                
-                TextField("amount", value: $amount, format: .currency(code: currency))
-                    .keyboardType(.decimalPad)
-                
-                Picker("Currency", selection: $currency){
-                    ForEach(currencies, id: \.self){
-                        Text($0)
+                    
+                    TextField("amount", value: $amount, format: .currency(code: currency))
+                        .keyboardType(.decimalPad)
+                    
+                    Picker("Currency", selection: $currency){
+                        ForEach(currencies, id: \.self){
+                            Text($0)
+                        }
                     }
                 }
             }
-            .navigationTitle("Add new expense")
+            .navigationTitle($name)
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 
                 if (name != "" && amount > 0.0){
