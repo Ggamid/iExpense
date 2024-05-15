@@ -43,21 +43,37 @@ struct AddView: View {
             }
             .navigationTitle("Add new expense")
             .toolbar {
-                Button(name != "" && amount >= 0.0 ? "Save" : "Cancel") {
-                    if name != "" && amount != 0.0{
-                        if type == "Personal"{
-                            expense.personalItems.append(ExpenseItem(id: UUID(), name: name, type: type, amount: amount, currency: currency))
-                        } else {
-                            expense.businessItems.append(ExpenseItem(id: UUID(), name: name, type: type, amount: amount, currency: currency))
+                
+                if (name != "" && amount > 0.0){
+                    ToolbarItem(placement: .confirmationAction){
+                        Button("Save") {
+                            saveWith(type)
+                            dismiss()
                         }
                     }
-                    dismiss()
+                }
+                ToolbarItem(placement: .cancellationAction){
+                    Button("Cancel"){
+                        dismiss()
+                    }
                 }
             }
+            .navigationBarBackButtonHidden()
         }
+        
     }
 }
 
 #Preview {
     AddView(expense: Expense())
+}
+
+extension AddView{
+    func saveWith(_ type: String) {
+        if type == "Personal"{
+            expense.personalItems.append(ExpenseItem(id: UUID(), name: name, type: type, amount: amount, currency: currency))
+        } else {
+            expense.businessItems.append(ExpenseItem(id: UUID(), name: name, type: type, amount: amount, currency: currency))
+        }
+    }
 }
