@@ -5,20 +5,26 @@
 //  Created by Gamıd Khalıdov on 08.05.2024.
 //
 
+import SwiftData
 import SwiftUI
 
 
 
 struct ContentView: View {
-    var expense = Expense()
+    
+    @Environment(\.modelContext) var modelContext
+    
+    @Query var businessItems: [BusinessExpense]
+    @Query var personalItems: [PersonalExpense]
+    
     @State var showingAddView = false
 
     var body: some View {
         NavigationStack{
             List{
-                if !expense.businessItems.isEmpty {
+                if !businessItems.isEmpty {
                     Section("Business expenses"){
-                        ForEach(expense.businessItems){ item in
+                        ForEach(businessItems){ item in
                             HStack{
                                 VStack(alignment: .leading){
                                     Text(item.name)
@@ -33,7 +39,7 @@ struct ContentView: View {
                             .background(getColor(by: item.amount))
                         }
                         .onDelete(perform: { indexSet in
-                            removeExtense(offset: indexSet, type: "Business")
+                            removeExtense(at: indexSet, type: "Business")
                         })
                     }
                 } else {
@@ -41,9 +47,9 @@ struct ContentView: View {
                         Text("There is no any Business expenses")
                     }
                 }
-                if !expense.personalItems.isEmpty {
+                if !personalItems.isEmpty {
                     Section("Personal expenses"){
-                        ForEach(expense.personalItems){ item in
+                        ForEach(personalItems){ item in
                             HStack{
                                 VStack(alignment: .leading){
                                     Text(item.name)
@@ -58,7 +64,7 @@ struct ContentView: View {
                             .background(getColor(by: item.amount))
                         }
                         .onDelete(perform: { indexSet in
-                            removeExtense(offset: indexSet, type: "Personal")
+                            removeExtense(at: indexSet, type: "Personal")
                         })
                     }
                 } else {
@@ -69,10 +75,11 @@ struct ContentView: View {
                 
                 
             }
+            .scrollBounceBehavior(.basedOnSize)
             .navigationTitle("iExpense")
             .toolbar{
                 NavigationLink{
-                    AddView(expense: expense)
+                    AddView()
                 } label: {
                     Image(systemName: "plus.app")
                 }
@@ -86,11 +93,17 @@ struct ContentView: View {
 }
 
 extension ContentView{
-    func removeExtense(offset: IndexSet, type: String){
+    func removeExtense(at offsets: IndexSet, type: String){
         if type == "Business"{
-            expense.businessItems.remove(atOffsets: offset)
+            for offset in offsets{
+                let expense = businessItems[offset]
+                modelContext.delete(expense)
+            }
         } else {
-            expense.personalItems.remove(atOffsets: offset)
+            for offset in offsets{
+                let expense = personalItems[offset]
+                modelContext.delete(expense)
+            }
         }
     }
     

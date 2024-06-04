@@ -9,6 +9,7 @@ import SwiftUI
 
 struct AddView: View {
     @Environment(\.dismiss) var dismiss
+    @Environment(\.modelContext) var modelContext
     
     @State private var name: String = "Name of Expense"
     @State private var amount: Double = 0.0
@@ -18,8 +19,6 @@ struct AddView: View {
     
     let types = ["Personal", "Business"]
     let currencies = ["USD", "RUB", "EUR", "KZT", "SSP"]
-    
-    var expense: Expense
     
     var body: some View {
         NavigationStack{
@@ -33,9 +32,11 @@ struct AddView: View {
                             Text($0)
                         }
                     }
-                    
-                    TextField("amount", value: $amount, format: .currency(code: currency))
-                        .keyboardType(.decimalPad)
+                    HStack{
+                        TextField("amount", value: $amount, format: .currency(code: currency))
+                            .keyboardType(.decimalPad)
+                        Stepper("", value: $amount)
+                    }
                     
                     Picker("Currency", selection: $currency){
                         ForEach(currencies, id: \.self){
@@ -69,15 +70,15 @@ struct AddView: View {
 }
 
 #Preview {
-    AddView(expense: Expense())
+    AddView()
 }
 
 extension AddView{
     func saveWith(_ type: String) {
         if type == "Personal"{
-            expense.personalItems.append(ExpenseItem(id: UUID(), name: name, type: type, amount: amount, currency: currency))
+            modelContext.insert(PersonalExpense(id: UUID(), name: name, type: type, amount: amount, currency: currency))
         } else {
-            expense.businessItems.append(ExpenseItem(id: UUID(), name: name, type: type, amount: amount, currency: currency))
+            modelContext.insert(BusinessExpense(id: UUID(), name: name, type: type, amount: amount, currency: currency))
         }
     }
 }

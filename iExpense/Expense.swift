@@ -5,55 +5,46 @@
 //  Created by Gamıd Khalıdov on 04.06.2024.
 //
 
+import SwiftData
 import Foundation
 
-struct ExpenseItem: Identifiable, Codable{
+
+@Model
+class BusinessExpense {
     
     var id: UUID
     var name: String
     var type: String
     var amount: Double
     var currency = "USD"
+    
+    init(id: UUID, name: String, type: String, amount: Double, currency: String = "USD") {
+        self.id = id
+        self.name = name
+        self.type = type
+        self.amount = amount
+        self.currency = currency
+    }
+    
 }
 
-@Observable
-class Expense{
-    var personalItems = [ExpenseItem]() {
-        didSet{
-            if let encoded = try? JSONEncoder().encode(personalItems){
-                UserDefaults.standard.set(encoded, forKey: "itemsPersonal")
-            }
-        }
-    }
-    var businessItems = [ExpenseItem]() {
-        didSet{
-            if let encoded = try? JSONEncoder().encode(businessItems){
-                UserDefaults.standard.set(encoded, forKey: "itemsBusiness")
-            }
-        }
-    }
-
+@Model
+class PersonalExpense {
     
-    init(){
-        if let savedItems = UserDefaults.standard.data(forKey: "itemsPersonal"){
-            if let decodeItems = try? JSONDecoder().decode([ExpenseItem].self, from: savedItems){
-                personalItems = decodeItems
-            }
-        }
-        
-        if personalItems.isEmpty {
-            personalItems = []
-        }
-        
-        if let savedItems = UserDefaults.standard.data(forKey: "itemsBusiness"){
-            if let decodeItems = try? JSONDecoder().decode([ExpenseItem].self, from: savedItems){
-                businessItems = decodeItems
-                return
-            }
-        }
-        
-        businessItems = []
-    }
+    var id: UUID
+    var name: String
+    var type: String
+    var amount: Double
+    var currency = "USD"
     
+    init(id: UUID, name: String, type: String, amount: Double, currency: String = "USD") {
+        self.id = id
+        self.name = name
+        self.type = type
+        self.amount = amount
+        self.currency = currency
+    }
     
 }
+
+
