@@ -34,6 +34,9 @@ struct ContentView: View {
                                 Spacer()
                                 Text(item.amount, format: .currency(code: item.currency))
                             }
+                            .accessibilityElement()
+                            .accessibilityLabel(" \(item.name) amount \(String(format: "%.2f", item.amount))")
+                            .accessibilityHint("type of expense\(item.type)")
                             .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
                             .padding()
                             .background(getColor(by: item.amount))
